@@ -59,6 +59,16 @@ re-run month 2015-02:
 **Interview line:** "I don't try to make failures impossible — I make re-runs
 free. Then failure handling is just 'retry'."
 
+**War story from this project:** during the 120-month backfill, the BTS
+server stalled one download mid-connection. The code used a network call
+with **no timeout**, so it didn't fail — it slept forever at 0% CPU while
+logs went silent. Retry logic never fired because nothing ever *failed*.
+Fix: socket timeout on every network call, so a stall becomes an exception,
+and the existing retry/backoff handles it. Lesson: **silence is not
+progress — a pipeline without timeouts hangs instead of failing loudly.**
+Restart cost nothing because ingestion is idempotent (skips months already
+in S3).
+
 ---
 
 ## Q3. "How do you handle duplicate data?"

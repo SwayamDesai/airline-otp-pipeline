@@ -70,7 +70,12 @@ def download_month(year: int, month: int) -> None:
             with tempfile.TemporaryDirectory() as tmp:
                 zip_path = Path(tmp) / "month.zip"
                 log.info("downloading %d-%02d (attempt %d)", year, month, attempt)
-                urllib.request.urlretrieve(url, zip_path)
+                # Socket timeout so a stalled connection raises instead of
+                # hanging forever — a hung download is invisible; a failed
+                # one gets retried.
+                with urllib.request.urlopen(url, timeout=120) as resp, \
+                        open(zip_path, "wb") as dst:
+                    shutil.copyfileobj(resp, dst)
 
                 with zipfile.ZipFile(zip_path) as zf:
                     csv_members = [n for n in zf.namelist() if n.endswith(".csv")]
