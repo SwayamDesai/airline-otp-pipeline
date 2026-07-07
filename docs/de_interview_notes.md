@@ -247,5 +247,30 @@ flights_pipeline.py (one file, @monthly)
 
 ---
 
+## Q14. "You already have dbt tests. Why also Great Expectations?"
+
+Different failure classes, different moments:
+
+| | dbt tests | GE checkpoint |
+|---|---|---|
+| Validates | structure (nulls, uniqueness, row-level ranges) | plausibility (volumes, distributions, freshness) |
+| Catches | broken grain, bad joins, invalid values | partial loads, silent logic regressions |
+| Runs | at build time, per model | as the final release gate before publishing |
+
+- Example dbt can't catch: all 120 months load, OTP is 0-100 everywhere,
+  grain is unique — but a definition change made **mean OTP 96%**. Perfectly
+  well-formed, obviously wrong. GE's distribution check
+  (`mean otp_pct between 60 and 95`) blocks it.
+- Example GE-only: pipeline "succeeds" but only 80 of 120 months landed —
+  every dbt test passes on the partial data. GE's **row-count band** fails.
+- The gate's contract is its exit code: 0 = publish, 1 = the dashboard
+  refresh never fires. Verified both directions in this project.
+
+**Interview line:** "dbt tests ask *is this table well-formed?* — the GE
+gate asks *does this data look like reality?* Both, because each catches
+what the other can't."
+
+---
+
 *Added per phase: Snowflake/dbt questions (Phase 2), data quality (Phase 3),
 Airflow scheduling/retries/backfills (Phase 4), IaC (Phase 5), CI/CD (Phase 6).*

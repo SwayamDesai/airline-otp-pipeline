@@ -84,7 +84,9 @@ Java 17 for Spark.
 
 - [x] Phase 1 — BTS ingestion + PySpark cleaning to partitioned Parquet
 - [x] Phase 2 — Snowflake load + dbt models (staging → marts)
-- [ ] Phase 3 — Great Expectations quality gate
+- [x] Phase 3 — Great Expectations quality gate (16 expectations across 4
+  marts: row-count bands, distribution checks, freshness; exit-code contract
+  verified in both directions)
 - [ ] Phase 4 — Airflow orchestration
 - [ ] Phase 5 — Terraform-provisioned Snowflake
 - [ ] Phase 6 — GitHub Actions CI/CD + Power BI REST API refresh
