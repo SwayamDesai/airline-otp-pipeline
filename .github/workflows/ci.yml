@@ -34,6 +34,10 @@ jobs:
           printf '%s' "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > "$SNOWFLAKE_PRIVATE_KEY_PATH"
           chmod 600 "$SNOWFLAKE_PRIVATE_KEY_PATH"
 
+      - name: dbt deps
+        working-directory: dbt_project
+        run: uv run dbt deps --profiles-dir .
+
       - name: dbt build (models + tests)
         working-directory: dbt_project
         run: uv run dbt build --profiles-dir .
