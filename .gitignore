@@ -1,0 +1,30 @@
+# Data — raw and processed files never belong in git
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Spark
+spark-warehouse/
+derby.log
+metastore_db/
+
+# Secrets
+.env
+*.pem
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate*
+terraform/*.tfvars
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/
+
+# OS
+.DS_Store
+dbt_project/.user.yml

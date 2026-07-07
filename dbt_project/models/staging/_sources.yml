@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Flight records loaded from the S3 lake (cleaned Parquet, partitioned by
+      year/month) via external stage + COPY INTO. Structurally clean already:
+      typed columns, deduplicated on the natural flight key, booleans
+      normalized. One row per scheduled flight leg.
+    database: AIRLINE_OTP
+    schema: raw
+    tables:
+      - name: flights
+        columns:
+          - name: flight_date
+            tests: [not_null]
+          - name: carrier_code
+            tests: [not_null]
+          - name: origin
+            tests: [not_null]
+          - name: dest
+            tests: [not_null]

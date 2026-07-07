@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: fct_monthly_otp
+    description: >
+      Headline KPI table — on-time performance, cancellations, and average
+      delays by carrier and month. OTP follows the DOT definition (arrival
+      within 15 minutes, over completed flights).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [month_start, carrier_code]
+    columns:
+      - name: month_start
+        tests: [not_null]
+      - name: carrier_code
+        tests: [not_null]
+      - name: otp_pct
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: cancellation_pct
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: scheduled_flights
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+
+  - name: fct_route_performance
+    description: Route-level (origin->dest, directed) performance by month.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [month_start, origin, dest]
+    columns:
+      - name: otp_pct
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+
+  - name: fct_airport_congestion
+    description: Airport flight volume and taxi times by month.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [month_start, airport_code]
+    columns:
+      - name: airport_code
+        tests: [not_null]
+      - name: total_movements
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+
+  - name: fct_delay_causes
+    description: >
+      Delay minutes attributed to DOT cause categories (carrier, weather,
+      NAS, security, late aircraft) by carrier and month, with percentage
+      shares.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [month_start, carrier_code]
+    columns:
+      - name: total_delay_min
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0

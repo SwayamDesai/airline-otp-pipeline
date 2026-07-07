@@ -1,0 +1,25 @@
+version: 2
+
+seeds:
+  - name: carriers
+    description: >
+      IATA reporting-carrier codes to airline names, covering carriers that
+      reported to BTS between 2015 and 2024. Unknown codes fall back to the
+      raw code downstream (left join + coalesce), so a new carrier never
+      breaks the pipeline.
+    columns:
+      - name: carrier_code
+        tests: [unique, not_null]
+      - name: carrier_name
+        tests: [not_null]
+
+  - name: cancellation_codes
+    description: BTS cancellation reason codes (A-D).
+    columns:
+      - name: cancellation_code
+        tests:
+          - unique
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["A", "B", "C", "D"]

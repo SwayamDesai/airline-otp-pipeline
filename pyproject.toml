@@ -1,0 +1,10 @@
+[project]
+name = "airline-otp-pipeline"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.43.41",
+    "dbt-core>=1.11.12",
+    "dbt-snowflake>=1.11.6",
+    "pyspark>=4.1.2",
+]

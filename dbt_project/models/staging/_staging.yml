@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: stg_flights
+    description: One row per scheduled flight leg, 2015-2024.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - flight_date
+              - carrier_code
+              - flight_number
+              - origin
+              - dest
+              - crs_dep_time
+    columns:
+      - name: flight_date
+        tests: [not_null]
+      - name: carrier_code
+        tests: [not_null]
+      - name: origin
+        tests: [not_null]
+      - name: dest
+        tests: [not_null]
+      - name: cancellation_code
+        description: Null unless the flight was cancelled.
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["A", "B", "C", "D"]
+              config:
+                severity: warn
+      - name: arr_delay_min
+        description: >
+          Null for cancelled/diverted flights by definition — they never
+          arrived. Downstream KPIs must filter on is_reportable_arrival
+          rather than assuming this is populated.
