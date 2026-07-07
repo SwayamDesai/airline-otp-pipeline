@@ -1,9 +1,14 @@
 # Airline On-Time Performance Analytics Pipeline
 
 End-to-end data engineering pipeline processing **10 years of US flight data
-(2015–2024, ~65M records, ~26GB raw)** from the Bureau of Transportation
+(2015–2024, 63M records, 26GB raw)** from the Bureau of Transportation
 Statistics into warehouse-modeled KPIs behind an auto-refreshing Power BI
 dashboard.
+
+**Measured at full scale:** 63,079,421 rows cleaned by Spark in 57 min on
+`local[*]` (26GB CSV → 1.6GB partitioned Parquet, 94% smaller), loaded into
+Snowflake via external stage in 2m12s with exact row-count reconciliation,
+36/36 dbt tests passing over the complete decade.
 
 ## Architecture
 
@@ -78,7 +83,7 @@ Java 17 for Spark.
 ## Project status
 
 - [x] Phase 1 — BTS ingestion + PySpark cleaning to partitioned Parquet
-- [ ] Phase 2 — Snowflake load + dbt models (staging → marts)
+- [x] Phase 2 — Snowflake load + dbt models (staging → marts)
 - [ ] Phase 3 — Great Expectations quality gate
 - [ ] Phase 4 — Airflow orchestration
 - [ ] Phase 5 — Terraform-provisioned Snowflake
