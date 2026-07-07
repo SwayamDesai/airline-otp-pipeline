@@ -87,7 +87,7 @@ Java 17 for Spark.
 - [x] Phase 3 — Great Expectations quality gate (16 expectations across 4
   marts: row-count bands, distribution checks, freshness; exit-code contract
   verified in both directions)
-- [ ] Phase 4 — Airflow orchestration
-- [ ] Phase 5 — Terraform-provisioned Snowflake
+- [x] Phase 4 — Airflow orchestration (Docker Compose, monthly DAG live-verified)
+- [x] Phase 5 — Terraform: full AWS + Snowflake estate imported, plan-clean
 - [ ] Phase 6 — GitHub Actions CI/CD + Power BI REST API refresh
 - [ ] Phase 7 — Power BI dashboard

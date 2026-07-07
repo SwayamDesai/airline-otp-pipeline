@@ -308,5 +308,31 @@ automation" means in practice.
 
 ---
 
+## Q17. "Why Terraform for a data platform? And how do you adopt existing infra?"
+
+- **Why**: the warehouse, roles, grants, bucket, and IAM trust are as much
+  "the pipeline" as the code is. In Terraform they are reviewable in PRs,
+  reproducible in a new account, and destroyable/recreatable on demand
+  (how this project conserves trial credits).
+- **Adopting hand-built infra**: modern Terraform uses declarative
+  `import` blocks — write the resource config, add `import { to, id }`,
+  and the plan shows the adoption. This project imported 12 live resources
+  (S3, IAM, warehouses, database, schema, roles, user, integration) and
+  reached **"No changes — infrastructure matches configuration"** as the
+  parity proof.
+- **Grants** were not imported: re-applying a GRANT is idempotent in
+  Snowflake, so letting Terraform "create" them is a safe no-op.
+
+**War story from this project:** the first plan wanted to **destroy and
+recreate the schema holding 63M rows.** Cause: `is_transient` is a
+create-only attribute; the live schema had it explicitly `false`, the
+config left it unset, and the provider read that as a change — and
+create-only changes mean replacement. One explicit line fixed it. Lesson:
+**read every plan before applying, and treat any unexplained destroy as a
+full stop.** `terraform plan` is a diff against production, not a
+formality.
+
+---
+
 *Added per phase: Snowflake/dbt questions (Phase 2), data quality (Phase 3),
 Airflow scheduling/retries/backfills (Phase 4), IaC (Phase 5), CI/CD (Phase 6).*
