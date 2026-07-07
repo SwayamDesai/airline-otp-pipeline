@@ -1,0 +1,9 @@
+# Pipeline runtime inside Airflow workers — mirrors the project's
+# pyproject dependencies (pinned where the version matters for behavior).
+pyspark==4.1.2
+boto3
+dbt-core
+dbt-snowflake
+great-expectations
+snowflake-sqlalchemy
+snowflake-connector-python

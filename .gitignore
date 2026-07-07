@@ -28,3 +28,6 @@ dbt_project/logs/
 # OS
 .DS_Store
 dbt_project/.user.yml
+
+# Airflow
+airflow/logs/

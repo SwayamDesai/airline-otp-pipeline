@@ -272,5 +272,41 @@ what the other can't."
 
 ---
 
+## Q15. "How do you handle missed runs? What's catchup?"
+
+- **Catchup** = Airflow noticing intervals that never ran and creating those
+  runs itself. `catchup=True`: scheduler backfills every missed interval
+  since `start_date`. `catchup=False`: only the latest interval runs.
+- **This project uses `catchup=False`** with history loaded by explicit
+  backfill scripts. Why: 120 historical months through the scheduler means
+  120 DAG runs competing for one laptop's resources, all rebuilding the
+  same dbt marts concurrently — the script-driven backfill does the same
+  work as a controlled sequential batch.
+- Rule of thumb: **catchup for small gaps, explicit backfill for history.**
+  A 2-month scheduler outage? Let catchup fill it. Ten years? Script it.
+- Related defense: each run's work is keyed to its logical date (Q13), so a
+  late-running or caught-up run still processes exactly its own month —
+  never "whatever data is newest."
+
+**War story from this project:** the first time the DAG was unpaused, the
+scheduler immediately created the current interval's run on its own — it
+resolved the 2-month BTS lag to April 2026, ingested a month we had never
+touched, passed the quality gate, and extended the dataset. Nothing was
+staged; the pipeline simply operated. That is what "the DAG is the
+automation" means in practice.
+
+## Q16. "Your task talks to an API/warehouse. What if it hangs?"
+
+- Every task in this project has an `execution_timeout` — Airflow kills
+  anything running past its budget and the retry policy takes over.
+- Retries use exponential backoff (transient blips resolve themselves;
+  hammering a struggling service makes it worse).
+- Exception: the quality gate has `retries=0` — a failed gate means the
+  data is wrong; retrying doesn't make wrong data right.
+- The whole run has `dagrun_timeout=2h` as the outer bound — the "3-hour
+  pipeline running 20 hours" scenario (Q1) is structurally impossible.
+
+---
+
 *Added per phase: Snowflake/dbt questions (Phase 2), data quality (Phase 3),
 Airflow scheduling/retries/backfills (Phase 4), IaC (Phase 5), CI/CD (Phase 6).*

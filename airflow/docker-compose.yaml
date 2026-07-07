@@ -1,0 +1,88 @@
+# Local Airflow 3 deployment, LocalExecutor.
+# The same DAG file deploys unchanged to MWAA/Astronomer — this compose
+# stack is the laptop equivalent of a managed Airflow environment.
+
+x-airflow-common: &airflow-common
+  build: .
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    # Local dev only: UI without login. A real deployment uses a proper
+    # auth manager + SSO.
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.api_fastapi.auth.managers.simple.simple_auth_manager.SimpleAuthManager
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+    # All services must share one JWT secret or task->apiserver auth fails.
+    # Local dev value; a real deployment injects this from a secret store.
+    AIRFLOW__API_AUTH__JWT_SECRET: airline-otp-local-dev-jwt-secret
+    REPO: /opt/airflow/repo
+    SNOWFLAKE_PRIVATE_KEY_PATH: /opt/airflow/keys/pipeline_svc_rsa.p8
+    AWS_SHARED_CREDENTIALS_FILE: /opt/airflow/aws/credentials
+    AWS_CONFIG_FILE: /opt/airflow/aws/config
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ..:/opt/airflow/repo
+    - ~/.snowflake/keys:/opt/airflow/keys:ro
+    - ~/.aws:/opt/airflow/aws:ro
+    - ivy-cache:/home/airflow/.ivy2
+  depends_on: &airflow-common-depends
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 10
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+  airflow-init:
+    <<: *airflow-common
+    command: ["airflow", "db", "migrate"]
+
+  airflow-apiserver:
+    <<: *airflow-common
+    command: api-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      <<: *airflow-common-depends
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    depends_on:
+      <<: *airflow-common-depends
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    depends_on:
+      <<: *airflow-common-depends
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-triggerer:
+    <<: *airflow-common
+    command: triggerer
+    depends_on:
+      <<: *airflow-common-depends
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-db:
+  ivy-cache:

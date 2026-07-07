@@ -43,10 +43,13 @@ def private_key_b64() -> str:
         lines = [l for l in f.read().splitlines() if not l.startswith("-")]
     return "".join(lines)
 
-# The backfill covers 2015-01 .. 2024-12; the newest month present must be
-# at least 2024-12. When live monthly loads begin, tighten this to a
-# rolling "within N months of today".
-NEWEST_MONTH_FLOOR = date(2024, 12, 1)
+# Rolling freshness SLA, active since the DAG went live: newest month must
+# be within 4 months of today (BTS publishes on a ~2-month lag, plus slack
+# for a missed run before we call the data stale).
+_today = date.today()
+_floor_month = (_today.month - 4 - 1) % 12 + 1
+_floor_year = _today.year + (_today.month - 4 - 1) // 12
+NEWEST_MONTH_FLOOR = date(_floor_year, _floor_month, 1)
 
 # table -> expectations guarding it
 SUITES: dict[str, list] = {
