@@ -91,5 +91,5 @@ Java 17 for Spark.
   verified in both directions)
 - [x] Phase 4 — Airflow orchestration (Docker Compose, monthly DAG live-verified)
 - [x] Phase 5 — Terraform: full AWS + Snowflake estate imported, plan-clean
-- [ ] Phase 6 — GitHub Actions CI/CD + Power BI REST API refresh
+- [x] Phase 6 — GitHub Actions CI (dbt + GE on every PR) + Power BI push delivery (761,909 KPI rows via REST API, device-code auth)
 - [ ] Phase 7 — Power BI dashboard

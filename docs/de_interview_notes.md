@@ -334,5 +334,29 @@ formality.
 
 ---
 
+## Q18. "What does CI/CD mean for a data pipeline?"
+
+Two different loops, often confused:
+
+- **CI (code loop, GitHub Actions)**: every PR runs the full transformation
+  layer against the live warehouse — dbt build (models + tests) then the
+  GE release gate. A change that breaks a model or degrades data quality
+  **cannot merge**. This is deploy-time protection.
+- **CD (data loop, Airflow)**: every scheduled run ends by shipping gated
+  KPI tables to the dashboard. This is runtime delivery — and it only
+  fires if the quality gate opened.
+- Key insight: in data engineering the *data* changes even when the code
+  doesn't, so testing only at deploy time is not enough — hence the gate
+  runs in both loops.
+
+**War story from this project:** the first bulk push to the BI layer hit
+the API's 1M-rows/hour quota (429 + `Retry-After: 3333s`) after two failed
+attempts burned the budget. The client honors `Retry-After` with
+exponential backoff for 5xx — the push resumed 55 minutes later,
+unattended, and completed. Rate limits are part of every external API's
+contract; production clients respect them instead of hammering.
+
+---
+
 *Added per phase: Snowflake/dbt questions (Phase 2), data quality (Phase 3),
 Airflow scheduling/retries/backfills (Phase 4), IaC (Phase 5), CI/CD (Phase 6).*
