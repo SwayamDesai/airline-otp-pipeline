@@ -1,14 +1,16 @@
 # Airline On-Time Performance Analytics Pipeline
 
-End-to-end data engineering pipeline processing **10 years of US flight data
-(2015–2024, 63M records, 26GB raw)** from the Bureau of Transportation
-Statistics into warehouse-modeled KPIs behind an auto-refreshing Power BI
-dashboard.
+End-to-end data engineering pipeline processing **US flight data from
+January 2015 to the present (72.9M records, ~30GB raw)** from the Bureau of
+Transportation Statistics into warehouse-modeled KPIs — kept current by a
+monthly Airflow DAG whose first scheduled run ingested a new month fully
+autonomously.
 
-**Measured at full scale:** 63,079,421 rows cleaned by Spark in 57 min on
-`local[*]` (26GB CSV → 1.6GB partitioned Parquet, 94% smaller), loaded into
-Snowflake via external stage in 2m12s with exact row-count reconciliation,
-36/36 dbt tests passing over the complete decade.
+**Measured at full scale:** 72,961,836 rows across 137 months cleaned by
+Spark on `local[*]` (~30GB CSV → 1.8GB partitioned Parquet, 94% smaller),
+loaded into Snowflake via external stage with exact row-count
+reconciliation, 36/36 dbt tests and a 16-expectation Great Expectations
+release gate passing over the full history.
 
 ## Architecture
 
