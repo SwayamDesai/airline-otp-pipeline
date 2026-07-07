@@ -17,7 +17,8 @@ jobs:
     env:
       SNOWFLAKE_ACCOUNT: QRFICHI-TQ35414
       SNOWFLAKE_USER: PIPELINE_SVC
-      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ runner.temp }}/sf_key.p8
+      # literal path: the runner context is not available in job-level env
+      SNOWFLAKE_PRIVATE_KEY_PATH: /tmp/sf_key.p8
 
     steps:
       - uses: actions/checkout@v4
