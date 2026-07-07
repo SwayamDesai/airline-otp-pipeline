@@ -7,6 +7,7 @@ dependencies = [
     "dbt-core>=1.11.12",
     "dbt-snowflake>=1.11.6",
     "great-expectations>=1.18.2",
+    "msal>=1.37.0",
     "pyspark>=4.1.2",
     "snowflake-sqlalchemy>=1.10.2",
 ]

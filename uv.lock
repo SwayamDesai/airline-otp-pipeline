@@ -40,6 +40,7 @@ dependencies = [
     { name = "dbt-core" },
     { name = "dbt-snowflake" },
     { name = "great-expectations" },
+    { name = "msal" },
     { name = "pyspark" },
     { name = "snowflake-sqlalchemy" },
 ]
@@ -50,6 +51,7 @@ requires-dist = [
     { name = "dbt-core", specifier = ">=1.11.12" },
     { name = "dbt-snowflake", specifier = ">=1.11.6" },
     { name = "great-expectations", specifier = ">=1.18.2" },
+    { name = "msal", specifier = ">=1.37.0" },
     { name = "pyspark", specifier = ">=4.1.2" },
     { name = "snowflake-sqlalchemy", specifier = ">=1.10.2" },
 ]
@@ -878,6 +880,20 @@ wheels = [
 ]
 
 [[package]]
+name = "msal"
+version = "1.37.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cryptography" },
+    { name = "pyjwt", extra = ["crypto"] },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9a/99/d840198ecf6e8057bbc937f129ae940404485d736cda73253bbff9537f01/msal-1.37.0.tar.gz", hash = "sha256:1b1672a33ee467c1d70b341bb16cafd51bb3c817147a95b93263794b03971bec", size = 182444, upload-time = "2026-05-29T19:49:05.561Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/94/b0/d807279f4b55d16d1f120d5ac4344c6e39b56732e2a224d40bded7fd67ad/msal-1.37.0-py3-none-any.whl", hash = "sha256:dd17e95a7c71bce75e8108113438ba7c4a086b3bcad4f57a8c09b7af3d753c2d", size = 123725, upload-time = "2026-05-29T19:49:04.335Z" },
+]
+
+[[package]]
 name = "msgpack"
 version = "1.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1225,6 +1241,11 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423", size = 107515, upload-time = "2026-05-21T19:54:36.618Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a3/5e/ecf12fdb62546d64385c158514e9b2b671f7832108ef2ecd2020ce0af2d1/pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728", size = 31274, upload-time = "2026-05-21T19:54:35.362Z" },
+]
+
+[package.optional-dependencies]
+crypto = [
+    { name = "cryptography" },
 ]
 
 [[package]]
