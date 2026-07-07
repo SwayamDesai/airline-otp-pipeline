@@ -19,7 +19,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 from airflow.providers.standard.operators.bash import BashOperator
-from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.sdk import dag, task
 
 BUCKET = "swayam-airline-otp"
@@ -96,9 +95,13 @@ def flights_pipeline():
         retries=0,  # a failed gate is a data problem, not a transient blip
     )
 
-    powerbi_refresh = EmptyOperator(
+    powerbi_refresh = BashOperator(
         task_id="powerbi_refresh",
-        doc_md="Placeholder — Phase 6 wires the Power BI REST API push here.",
+        bash_command=f"cd {REPO} && python scripts/powerbi_push.py",
+        # generous budget: the push honors Power BI's hourly-quota
+        # Retry-After, which can be a ~55 minute sleep
+        execution_timeout=timedelta(minutes=90),
+        retries=1,
     )
 
     (

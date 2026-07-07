@@ -20,12 +20,15 @@ x-airflow-common: &airflow-common
     SNOWFLAKE_PRIVATE_KEY_PATH: /opt/airflow/keys/pipeline_svc_rsa.p8
     AWS_SHARED_CREDENTIALS_FILE: /opt/airflow/aws/credentials
     AWS_CONFIG_FILE: /opt/airflow/aws/config
+    POWERBI_TOKEN_CACHE: /opt/airflow/powerbi/token_cache.json
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ..:/opt/airflow/repo
     - ~/.snowflake/keys:/opt/airflow/keys:ro
     - ~/.aws:/opt/airflow/aws:ro
+    # rw: MSAL rotates the refresh token inside the cache on renewal
+    - ~/.powerbi:/opt/airflow/powerbi
     - ivy-cache:/home/airflow/.ivy2
   depends_on: &airflow-common-depends
     postgres:
